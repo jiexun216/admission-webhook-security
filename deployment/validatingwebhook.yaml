@@ -1,0 +1,23 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: validation-webhook-security-cfg
+  labels:
+    app: admission-webhook-security
+webhooks:
+  - name: required-labels.datacreating.com
+    clientConfig:
+      service:
+        name: admission-webhook-security-svc
+        namespace: jiexun-test
+        path: "/validate"
+      caBundle: ${CA_BUNDLE}
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    namespaceSelector:
+      matchLabels:
+        admission-webhook-security: enabled
+    timeoutSeconds: 5

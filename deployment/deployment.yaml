@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission-webhook-security-deployment
+  labels:
+    app: admission-webhook-security
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admission-webhook-security
+  template:
+    metadata:
+      labels:
+        app: admission-webhook-security
+    spec:
+      serviceAccount: admission-webhook-security-sa
+      containers:
+        - name: admission-webhook-security
+          image: daocloud.io/daocloud/admission-webhook-security:latest
+          imagePullPolicy: Always
+          args:
+            - -tlsCertFile=/etc/webhook/certs/cert.pem
+            - -tlsKeyFile=/etc/webhook/certs/key.pem
+            - -alsologtostderr
+            - -v=4
+            - 2>&1
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: admission-webhook-security-certs
