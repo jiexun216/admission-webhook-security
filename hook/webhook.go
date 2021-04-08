@@ -42,13 +42,13 @@ const (
 	// if the object has the Annotation key and it's
 	// value = "n" or "no" or "false" or "off", then do not mutate
 	admissionWebhookAnnotationMutateKey   = "admission-webhook-security.datacreating.com/mutate"
-
-	// admissionWebhookAnnotationStatusKey's value
-	admissionWebhookAnnotationMutateKeyValue = "mutated"
-
+	
 	// mark the object has already mutated by  webhookserver
 	// if this' value is "mutated", then do not continue mutate
 	admissionWebhookAnnotationStatusKey   = "admission-webhook-security.datacreating.com/status"
+
+	// admissionWebhookAnnotationStatusKey's value
+	admissionWebhookAnnotationStatusKeyValue = "mutated"
 
 	// add the object labels
 	nameLabel      = "app.kubernetes.io/securityContext"
@@ -182,7 +182,7 @@ func (whsvr *WebhookServer) mutate(ar *v1beta1.AdmissionReview) *v1beta1.Admissi
 		}
 	}
 
-	annotations := map[string]string{admissionWebhookAnnotationStatusKey: admissionWebhookAnnotationMutateKeyValue}
+	annotations := map[string]string{admissionWebhookAnnotationStatusKey: admissionWebhookAnnotationStatusKeyValue}
 	// jiexun modify pod
 	patchBytes, err := createSpecSecurityContextPatch(availableAnnotations, annotations, availableLabels, addLabels)
 	//patchBytes, err := createModifyContainersResourcesPatch(pod, availableAnnotations, annotations, availableLabels, addLabels)
@@ -239,7 +239,7 @@ func mutationRequired(ignoredList []string, metadata *metav1.ObjectMeta) bool {
 	}
 	status := annotations[admissionWebhookAnnotationStatusKey]
 
-	if strings.ToLower(status) == admissionWebhookAnnotationMutateKeyValue {
+	if strings.ToLower(status) == admissionWebhookAnnotationStatusKeyValue {
 		required = false
 	}
 
